@@ -28,6 +28,11 @@ export const createPhoto = async (req, res) => {
     const { title, description, imageUrl, albumId } = req.body;
     if (!title || !imageUrl || !albumId) return res.status(400).json({ error: "Missing fields" });
     if (!req.user.id) return res.status(401).json({ error: "Login required" });
+    try {
+      new URL(imageUrl);
+    } catch {
+      return res.status(422).json({ error: "Invalid image URL" });
+    }
 
     // verify album exists
     const album = await prisma.album.findUnique({ where: { id: Number(albumId) } });
@@ -52,7 +57,15 @@ export const updatePhoto = async (req, res) => {
     // only uploader or admin can update
     if (existing.uploadedById !== req.user.id && req.user.role !== "admin") return res.status(403).json({ error: "Forbidden" });
 
-    const { title, description } = req.body;
+    const { title, description, imageUrl } = req.body;
+    if (imageUrl) {
+      try {
+        new URL(imageUrl);
+      } catch {
+        return res.status(422).json({ error: "Invalid image URL" });
+      }
+    }
+    
     const updated = await prisma.photo.update({ where: { id }, data: { title, description } });
     res.json(updated);
   } catch (err) {
