@@ -8,6 +8,11 @@ import authRoutes from "./routes/auth.js";
 import commentRoutes from "./routes/comments.js";
 import photosRoutes from "./routes/photos.js";
 
+// Swagger
+import swaggerUi from "swagger-ui-express";
+import YAML from "yamljs";
+const swaggerDocument = YAML.load("swagger.yaml");
+
 dotenv.config();
 
 const app = express();
@@ -24,6 +29,9 @@ app.use("/auth", authRoutes);
 app.use("/comments", commentRoutes);
 app.use("/photos", photosRoutes);
 
+// Swagger UI endpoint
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
 // Health check & root
 app.get("/", (req, res) => res.json({ message: "Kates API is running" }));
 app.get("/health", (req, res) => res.status(200).json({ status: "ok" }));
@@ -34,4 +42,5 @@ const HOST = process.env.HOST || "localhost";
 
 app.listen(PORT, () => {
   console.log(`Server is running: http://${HOST}:${PORT}/`);
+  console.log(`Swagger UI: http://${HOST}:${PORT}/api-docs`);
 });
