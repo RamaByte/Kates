@@ -48,14 +48,9 @@ export const createRefreshToken = async (user) => {
   return refreshToken;
 };
 
-/**
- * Paverčia, pvz. "15m", "7d" į ms (milisekundes)
- */
 const parseExpires = (value) => {
-  // labai paprastas parseris
   const match = /^(\d+)([smhd])$/.exec(value);
   if (!match) {
-    // default 7d
     return 7 * 24 * 60 * 60 * 1000;
   }
   const num = Number(match[1]);
@@ -73,7 +68,6 @@ const parseExpires = (value) => {
       return num * 1000;
   }
 };
-
 
 export const verifyAccessToken = (token) => {
   const payload = jwt.verify(token, ACCESS_SECRET);
