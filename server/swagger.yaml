@@ -6,6 +6,8 @@ info:
     API kačiukų albumų, nuotraukų ir komentarų valdymui.
     Autentifikacija paremta JWT access + refresh tokenais.
 servers:
+  - url: https://kates.onrender.com
+    description: Production (Render)
   - url: http://localhost:4000
     description: Local development
 
