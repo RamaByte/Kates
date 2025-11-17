@@ -1,103 +1,136 @@
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
 import { PrismaClient } from "@prisma/client";
+import {
+  createAccessToken,
+  createRefreshToken,
+  verifyRefreshToken,
+  revokeRefreshToken,
+} from "../utils/jwt.js";
 
 const prisma = new PrismaClient();
 
-const createAccessToken = (user) => {
-  return jwt.sign({ userId: user.id, role: user.role }, process.env.JWT_SECRET, { expiresIn: "15m" });
+const buildAuthResponse = async (user) => {
+  const accessToken = createAccessToken(user);
+  const refreshToken = await createRefreshToken(user);
+  return {
+    user: { id: user.id, name: user.name, email: user.email, role: user.role },
+    accessToken,
+    refreshToken,
+  };
 };
 
-const createRefreshToken = (user) => {
-  return jwt.sign({ userId: user.id }, process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET, { expiresIn: "7d" });
-};
-
+// POST /auth/register
 export const register = async (req, res) => {
   try {
     const { name, email, password } = req.body;
-    if (!name || !email || !password) return res.status(400).json({ error: "Missing fields" });
+
+    if (!name || !email || !password) {
+      return res.status(400).json({ error: "name, email ir password būtini" });
+    }
 
     const existing = await prisma.user.findUnique({ where: { email } });
-    if (existing) return res.status(409).json({ error: "Email already in use" });
+    if (existing) {
+      return res.status(422).json({ error: "Vartotojas su tokiu el. paštu jau yra" });
+    }
 
     const hashed = await bcrypt.hash(password, 10);
+
+    // Registruojamas member
     const user = await prisma.user.create({
-      data: { name, email, password: hashed, role: "member" } // registrations become members
+      data: {
+        name,
+        email,
+        password: hashed,
+        role: "member",
+      },
     });
 
-    const accessToken = createAccessToken(user);
-    const refreshToken = createRefreshToken(user);
+    const auth = await buildAuthResponse(user);
 
-    // store refresh token in DB (optional but recommended)
-    await prisma.user.update({ where: { id: user.id }, data: { refreshToken } });
-
-    // return tokens
-    res.status(201).json({ user: { id: user.id, name: user.name, email: user.email, role: user.role }, accessToken, refreshToken });
+    return res.status(201).json(auth);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Server error" });
+    console.error("register error:", err);
+    res.status(500).json({ error: "Serverio klaida" });
   }
 };
 
+// POST /auth/login
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    if (!email || !password) return res.status(400).json({ error: "Missing fields" });
 
-    const user = await prisma.user.findUnique({ where: { email } });
-    if (!user) return res.status(401).json({ error: "Invalid credentials" });
-
-    const ok = await bcrypt.compare(password, user.password);
-    if (!ok) return res.status(401).json({ error: "Invalid credentials" });
-
-    const accessToken = createAccessToken(user);
-    const refreshToken = createRefreshToken(user);
-
-    await prisma.user.update({ where: { id: user.id }, data: { refreshToken } });
-
-    res.json({ user: { id: user.id, name: user.name, email: user.email, role: user.role }, accessToken, refreshToken });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Server error" });
-  }
-};
-
-export const refreshToken = async (req, res) => {
-  try {
-    const { refreshToken } = req.body;
-    if (!refreshToken) return res.status(400).json({ error: "No refresh token" });
-
-    let payload;
-    try {
-      payload = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET);
-    } catch (e) {
-      return res.status(401).json({ error: "Invalid refresh token" });
+    if (!email || !password) {
+      return res.status(400).json({ error: "email ir password būtini" });
     }
 
-    const user = await prisma.user.findUnique({ where: { id: payload.userId } });
-    if (!user || user.refreshToken !== refreshToken) return res.status(401).json({ error: "Refresh token not recognized" });
+    const user = await prisma.user.findUnique({ where: { email } });
+    if (!user) {
+      return res.status(422).json({ error: "Neteisingi prisijungimo duomenys" });
+    }
 
-    const newAccess = createAccessToken(user);
-    const newRefresh = createRefreshToken(user);
+    const valid = await bcrypt.compare(password, user.password);
+    if (!valid) {
+      return res.status(422).json({ error: "Neteisingi prisijungimo duomenys" });
+    }
 
-    await prisma.user.update({ where: { id: user.id }, data: { refreshToken: newRefresh } });
+    const auth = await buildAuthResponse(user);
 
-    res.json({ accessToken: newAccess, refreshToken: newRefresh });
+    res.json(auth);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Server error" });
+    console.error("login error:", err);
+    res.status(500).json({ error: "Serverio klaida" });
   }
 };
 
+// POST /auth/refresh
+export const refresh = async (req, res) => {
+  try {
+    const { refreshToken } = req.body;
+
+    if (!refreshToken) {
+      return res.status(400).json({ error: "Trūksta refreshToken" });
+    }
+
+    const { payload, tokenRecord } = await verifyRefreshToken(refreshToken);
+
+    const user = await prisma.user.findUnique({ where: { id: payload.sub } });
+    if (!user) {
+      return res.status(404).json({ error: "Vartotojas nerastas" });
+    }
+
+    await revokeRefreshToken(tokenRecord.tokenId);
+
+    const newAccessToken = createAccessToken(user);
+    const newRefreshToken = await createRefreshToken(user);
+
+    return res.json({
+      accessToken: newAccessToken,
+      refreshToken: newRefreshToken,
+    });
+  } catch (err) {
+    console.error("refresh error:", err);
+    return res.status(422).json({ error: "Neleistinas refresh tokenas" });
+  }
+};
+
+// POST /auth/logout
 export const logout = async (req, res) => {
   try {
-    const { userId } = req.body;
-    if (!userId) return res.status(400).json({ error: "Missing userId" });
+    const { refreshToken } = req.body;
 
-    await prisma.user.update({ where: { id: userId }, data: { refreshToken: null } });
-    res.json({ ok: true });
+    if (!refreshToken) {
+      return res.status(400).json({ error: "Trūksta refreshToken" });
+    }
+
+    try {
+      const { payload, tokenRecord } = await verifyRefreshToken(refreshToken);
+      await revokeRefreshToken(tokenRecord.tokenId);
+    } catch (e) {
+    }
+
+    return res.status(200).json({ message: "Atsijungta" });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Server error" });
+    console.error("logout error:", err);
+    res.status(500).json({ error: "Serverio klaida" });
   }
 };
