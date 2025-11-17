@@ -21,7 +21,6 @@ const prisma = new PrismaClient();
 // Middleware
 app.use(cors());
 app.use(express.json());
-app.use(authMiddleware);
 
 // Routes
 app.use("/albums", albumRoutes);

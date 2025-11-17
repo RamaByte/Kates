@@ -16,7 +16,7 @@ router.get("/", getAlbums); // GET /albums
 router.get("/:id", getAlbumById); // GET /albums/:id
 router.post("/", authMiddleware, roleMiddleware(["member", "admin"]), createAlbum); // POST
 router.put("/:id", authMiddleware, roleMiddleware(["member", "admin"]), updateAlbum); // PUT
-router.delete("/:id", authMiddleware, roleMiddleware(["admin"]), deleteAlbum); // DELETE
+router.delete("/:id", authMiddleware, roleMiddleware(["member", "admin"]), deleteAlbum); // DELETE
 
 router.get("/:id/photos", getAlbumPhotos); // hierarchical
 

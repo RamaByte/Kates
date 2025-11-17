@@ -9,15 +9,16 @@ datasource db {
 }
 
 model User {
-  id             Int       @id @default(autoincrement())
+  id             Int            @id @default(autoincrement())
   name           String
-  email          String    @unique
+  email          String         @unique
   password       String
-  role           String    @default("member")
+  role           String         @default("member")
   albums         Album[]
   comments       Comment[]
-  uploadedPhotos Photo[]   @relation("UserUploadedPhotos")
-  createdAt      DateTime  @default(now())
+  uploadedPhotos Photo[]        @relation("UserUploadedPhotos")
+  refreshTokens  RefreshToken[]
+  createdAt      DateTime       @default(now())
 }
 
 model Album {
@@ -51,4 +52,15 @@ model Comment {
   photo     Photo    @relation(fields: [photoId], references: [id])
   photoId   Int
   createdAt DateTime @default(now())
+}
+
+model RefreshToken {
+  id              Int       @id @default(autoincrement())
+  tokenId         String    @unique
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId          Int
+  expiresAt       DateTime
+  revokedAt       DateTime?
+  replacedByToken String?
+  createdAt       DateTime  @default(now())
 }

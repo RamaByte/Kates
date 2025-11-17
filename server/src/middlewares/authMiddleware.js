@@ -1,31 +1,36 @@
-// backend/src/middlewares/authMiddleware.js
 import { PrismaClient } from "@prisma/client";
+import { verifyAccessToken } from "../utils/jwt.js";
+
 const prisma = new PrismaClient();
 
-/**
- * Jei ateina header X-User-Id => užkrauna vartotoją į req.user.
- * Jei nėra header — req.user = { role: "guest" }.
- * Naudoma tik laborui / demo; vėliau galima pakeisti į JWT.
- */
 export const authMiddleware = async (req, res, next) => {
   try {
-    const userIdHeader = req.header("X-User-Id");
-    if (!userIdHeader) {
-      // guest
-      req.user = { role: "guest" };
-      return next();
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+      return res.status(404).json({ error: "Trūksta Authorization header" });
     }
 
-    const userId = Number(userIdHeader);
-    if (Number.isNaN(userId)) return res.status(400).json({ error: "Bad X-User-Id header" });
+    const [scheme, token] = authHeader.split(" ");
+    if (scheme !== "Bearer" || !token) {
+      return res.status(400).json({ error: "Neteisingas Authorization formatas" });
+    }
 
-    const user = await prisma.user.findUnique({ where: { id: userId } });
-    if (!user) return res.status(401).json({ error: "User not found" });
+    const payload = verifyAccessToken(token);
 
-    req.user = { id: user.id, role: user.role, name: user.name };
+    const user = await prisma.user.findUnique({ where: { id: payload.sub } });
+    if (!user) {
+      return res.status(404).json({ error: "Vartotojas nerastas" });
+    }
+
+    req.user = {
+      id: user.id,
+      role: user.role,
+      name: user.name,
+    };
+
     next();
   } catch (err) {
     console.error("authMiddleware error:", err);
-    res.status(500).json({ error: "Server error" });
+    return res.status(422).json({ error: "Neleistinas ar pasibaigęs tokenas" });
   }
 };

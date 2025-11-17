@@ -1,307 +1,94 @@
 openapi: 3.0.1
 info:
-  title: Kates API
+  title: Kačiukų forumo API
   version: 1.0.0
+  description: >
+    API kačiukų albumų, nuotraukų ir komentarų valdymui.
+    Autentifikacija paremta JWT access + refresh tokenais.
 servers:
   - url: http://localhost:4000
-paths:
-  /albums:
-    get:
-      summary: Get all albums
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Album'
-    post:
-      summary: Create new album
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/AlbumCreate'
-      responses:
-        '201':
-          description: Created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Album'
-        '400':
-          description: Bad request (missing fields)
-        '401':
-          description: Unauthorized (guest cannot create)
-  /albums/{id}:
-    get:
-      summary: Get album by ID
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Album'
-        '404':
-          description: Album not found
-    put:
-      summary: Update album
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/AlbumCreate'
-      responses:
-        '200':
-          description: Updated
-        '403':
-          description: Forbidden (not owner/admin)
-        '404':
-          description: Album not found
-    delete:
-      summary: Delete album
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-      responses:
-        '200':
-          description: Deleted
-        '403':
-          description: Forbidden
-        '404':
-          description: Album not found
-
-  /albums/{id}/photos:
-    get:
-      summary: Get all photos in an album
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Photo'
-
-  /photos:
-    get:
-      summary: Get all photos
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Photo'
-    post:
-      summary: Create a photo
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/PhotoCreate'
-      responses:
-        '201':
-          description: Created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Photo'
-        '400':
-          description: Missing fields
-        '401':
-          description: Unauthorized
-        '404':
-          description: Album not found
-        '422':
-          description: Invalid image URL
-  /photos/{id}:
-    get:
-      summary: Get photo by ID
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Photo'
-        '404':
-          description: Photo not found
-    put:
-      summary: Update photo
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/PhotoUpdate'
-      responses:
-        '200':
-          description: Updated
-        '403':
-          description: Forbidden
-        '404':
-          description: Photo not found
-        '422':
-          description: Invalid image URL
-    delete:
-      summary: Delete photo
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-      responses:
-        '200':
-          description: Deleted
-        '403':
-          description: Forbidden
-        '404':
-          description: Photo not found
-
-  /photos/{id}/comments:
-    get:
-      summary: Get comments for photo
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Comment'
-
-  /comments:
-    get:
-      summary: Get all comments
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Comment'
-    post:
-      summary: Create comment
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CommentCreate'
-      responses:
-        '201':
-          description: Created
-        '400':
-          description: Missing fields
-        '401':
-          description: Unauthorized
-
-  /comments/{id}:
-    get:
-      summary: Get comment by ID
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-      responses:
-        '200':
-          description: OK
-        '404':
-          description: Comment not found
-    put:
-      summary: Update comment
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CommentCreate'
-      responses:
-        '200':
-          description: Updated
-        '403':
-          description: Forbidden
-        '404':
-          description: Comment not found
-    delete:
-      summary: Delete comment
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-      responses:
-        '200':
-          description: Deleted
-        '403':
-          description: Forbidden
-        '404':
-          description: Comment not found
+    description: Local development
 
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
   schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        email:
+          type: string
+        role:
+          type: string
+          description: Naudotojo rolė (guest/member/admin)
+
+    AuthRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+
+    RegisterRequest:
+      type: object
+      required:
+        - name
+        - email
+        - password
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+
+    AuthResponse:
+      type: object
+      properties:
+        user:
+          $ref: '#/components/schemas/User'
+        accessToken:
+          type: string
+        refreshToken:
+          type: string
+
+    RefreshRequest:
+      type: object
+      required:
+        - refreshToken
+      properties:
+        refreshToken:
+          type: string
+
+    TokenPair:
+      type: object
+      properties:
+        accessToken:
+          type: string
+        refreshToken:
+          type: string
+
+    LogoutRequest:
+      type: object
+      required:
+        - refreshToken
+      properties:
+        refreshToken:
+          type: string
+
     Album:
       type: object
       properties:
@@ -313,6 +100,7 @@ components:
           type: string
         userId:
           type: integer
+
     AlbumCreate:
       type: object
       required:
@@ -322,6 +110,7 @@ components:
           type: string
         description:
           type: string
+
     Photo:
       type: object
       properties:
@@ -337,6 +126,7 @@ components:
           type: integer
         uploadedById:
           type: integer
+
     PhotoCreate:
       type: object
       required:
@@ -352,15 +142,7 @@ components:
           type: string
         albumId:
           type: integer
-    PhotoUpdate:
-      type: object
-      properties:
-        title:
-          type: string
-        description:
-          type: string
-        imageUrl:
-          type: string
+
     Comment:
       type: object
       properties:
@@ -372,6 +154,7 @@ components:
           type: integer
         photoId:
           type: integer
+
     CommentCreate:
       type: object
       required:
@@ -382,3 +165,437 @@ components:
           type: string
         photoId:
           type: integer
+
+paths:
+  ############################
+  # Auth
+  ############################
+  /auth/register:
+    post:
+      summary: Registracija
+      description: Sukuria naują member naudotoją ir grąžina access + refresh tokenus.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: Sukurtas naudotojas ir tokenai
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          description: Blogas prašymas (trūksta laukų)
+        '409':
+          description: El. paštas jau naudojamas
+
+  /auth/login:
+    post:
+      summary: Prisijungimas
+      description: Patikrina email ir slaptažodį, grąžina access + refresh tokenus.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthRequest'
+      responses:
+        '200':
+          description: Sėkmingas prisijungimas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          description: Blogas prašymas
+        '401':
+          description: Neteisingi prisijungimo duomenys
+
+  /auth/refresh:
+    post:
+      summary: Atnaujinti access tokeną
+      description: >
+        Priima refreshToken, patikrina jį, rotuoja ir grąžina naujus access + refresh tokenus.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshRequest'
+      responses:
+        '200':
+          description: Nauji tokenai
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenPair'
+        '400':
+          description: Trūksta refreshToken
+        '401':
+          description: Neteisingas ar pasibaigęs refresh tokenas
+
+  /auth/logout:
+    post:
+      summary: Atsijungimas
+      description: >
+        Anuliuoja pateiktą refreshToken (jei validus) ir pažymi kaip revoked DB pusėje.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LogoutRequest'
+      responses:
+        '200':
+          description: Atsijungta sėkmingai
+        '400':
+          description: Trūksta refreshToken
+
+  ############################
+  # Albums
+  ############################
+  /albums:
+    get:
+      summary: Gauti visus albumus
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Album'
+    post:
+      summary: Sukurti naują albumą
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AlbumCreate'
+      responses:
+        '201':
+          description: Albumas sukurtas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Album'
+        '400':
+          description: Blogas payload
+        '401':
+          description: Neautorizuota
+        '403':
+          description: Neturi teisių
+
+  /albums/{id}:
+    get:
+      summary: Gauti albumą pagal ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Album'
+        '404':
+          description: Albumas nerastas
+    put:
+      summary: Atnaujinti albumą
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AlbumCreate'
+      responses:
+        '200':
+          description: Atnaujintas
+        '400':
+          description: Blogas payload
+        '401':
+          description: Neautorizuota
+        '403':
+          description: Neturi teisių
+        '404':
+          description: Albumas nerastas
+    delete:
+      summary: Ištrinti albumą
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Ištrinta
+        '401':
+          description: Neautorizuota
+        '403':
+          description: Neturi teisių
+        '404':
+          description: Albumas nerastas
+
+  /albums/{id}/photos:
+    get:
+      summary: Gauti albumo nuotraukas
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Photo'
+        '404':
+          description: Albumas nerastas (jei taip padarysi controller'yje)
+
+  ############################
+  # Photos
+  ############################
+  /photos:
+    get:
+      summary: Gauti visas nuotraukas
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Photo'
+    post:
+      summary: Sukurti nuotrauką
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PhotoCreate'
+      responses:
+        '201':
+          description: Sukurta nuotrauka
+        '400':
+          description: Blogas payload
+        '401':
+          description: Neautorizuota
+        '404':
+          description: Albumas nerastas
+
+  /photos/{id}:
+    get:
+      summary: Gauti nuotrauką pagal ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Photo'
+        '404':
+          description: Nuotrauka nerasta
+    put:
+      summary: Atnaujinti nuotrauką
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PhotoCreate'
+      responses:
+        '200':
+          description: Atnaujinta
+        '400':
+          description: Blogas payload
+        '401':
+          description: Neautorizuota
+        '403':
+          description: Neturi teisių
+        '404':
+          description: Nuotrauka nerasta
+    delete:
+      summary: Ištrinti nuotrauką
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Ištrinta
+        '401':
+          description: Neautorizuota
+        '403':
+          description: Neturi teisių
+        '404':
+          description: Nuotrauka nerasta
+
+  /photos/{id}/comments:
+    get:
+      summary: Gauti nuotraukos komentarus
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Comment'
+        '404':
+          description: Nuotrauka nerasta (jei taip darai controller'yje)
+
+  ############################
+  # Comments
+  ############################
+  /comments:
+    get:
+      summary: Gauti visus komentarus
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Comment'
+    post:
+      summary: Sukurti komentarą
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommentCreate'
+      responses:
+        '201':
+          description: Sukurtas
+        '400':
+          description: Blogas payload
+        '401':
+          description: Neautorizuota
+        '404':
+          description: Nuotrauka nerasta
+
+  /comments/{id}:
+    get:
+      summary: Gauti komentarą pagal ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+        '404':
+          description: Komentaras nerastas
+    put:
+      summary: Atnaujinti komentarą
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommentCreate'
+      responses:
+        '200':
+          description: Atnaujintas
+        '400':
+          description: Blogas payload
+        '401':
+          description: Neautorizuota
+        '403':
+          description: Neturi teisių
+        '404':
+          description: Komentaras nerastas
+    delete:
+      summary: Ištrinti komentarą
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Ištrintas
+        '401':
+          description: Neautorizuota
+        '403':
+          description: Neturi teisių
+        '404':
+          description: Komentaras nerastas
