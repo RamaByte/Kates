@@ -1,3 +1,4 @@
+// src/App.jsx
 import React, { useEffect, useState } from "react";
 import { Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
@@ -5,11 +6,14 @@ import Footer from "./components/Footer";
 import Home from "./pages/Home";
 import Albums from "./pages/Albums";
 import AlbumDetails from "./pages/AlbumDetails";
+import Photos from "./pages/Photos";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import MyAlbums from "./pages/MyAlbums";
 import CreateAlbum from "./pages/CreateAlbum";
 import CreatePhoto from "./pages/CreatePhoto";
+import EditAlbum from "./pages/EditAlbum";
+import EditPhoto from "./pages/EditPhoto";
 import Modal from "./components/Modal";
 import api from "./api/client";
 
@@ -69,9 +73,20 @@ const App = () => {
           element={<AlbumDetails currentUser={currentUser} />}
         />
         <Route
+          path="/albums/:id/edit"
+          element={<EditAlbum currentUser={currentUser} />}
+        />
+        <Route
           path="/albums/:albumId/photos/new"
           element={<CreatePhoto currentUser={currentUser} />}
         />
+
+        <Route path="/photos" element={<Photos />} />
+        <Route
+          path="/photos/:id/edit"
+          element={<EditPhoto currentUser={currentUser} />}
+        />
+
         <Route
           path="/login"
           element={<Login onLoginSuccess={handleLoginSuccess} />}

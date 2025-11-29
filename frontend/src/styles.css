@@ -169,12 +169,19 @@ a {
 
 .btn-text {
     background: transparent;
+    color: var(--accent);
+    /* pvz. rožinė, matoma ant balto fono */
+}
+
+/* Header'e ant tamsaus fono paliekam baltą */
+.header .btn-text {
     color: white;
 }
 
 .btn-text:hover {
     text-decoration: underline;
 }
+
 
 .full-width {
     width: 100%;

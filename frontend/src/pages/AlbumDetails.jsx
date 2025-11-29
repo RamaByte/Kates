@@ -1,10 +1,13 @@
+// src/pages/AlbumDetails.jsx
 import React, { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import api from "../api/client";
 import Modal from "../components/Modal";
 
 const AlbumDetails = ({ currentUser }) => {
-    const { id } = useParams();
+    const { id } = useParams(); // album id
+    const navigate = useNavigate();
+
     const [album, setAlbum] = useState(null);
     const [photos, setPhotos] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -14,6 +17,9 @@ const AlbumDetails = ({ currentUser }) => {
     const [commentsLoading, setCommentsLoading] = useState(false);
     const [commentError, setCommentError] = useState("");
     const [newComment, setNewComment] = useState("");
+
+    const [editingCommentId, setEditingCommentId] = useState(null);
+    const [editingCommentText, setEditingCommentText] = useState("");
 
     useEffect(() => {
         const fetchData = async () => {
@@ -33,11 +39,38 @@ const AlbumDetails = ({ currentUser }) => {
         fetchData();
     }, [id]);
 
+    // ----- Album permission helpers -----
+    const canEditAlbum =
+        currentUser &&
+        (currentUser.role === "admin" || album?.userId === currentUser.id);
+
+    const handleEditAlbum = () => {
+        if (!album) return;
+        navigate(`/albums/${id}/edit`);
+    };
+
+    const handleDeleteAlbum = async () => {
+        if (!album) return;
+        const confirmed = window.confirm("Delete this album?");
+        if (!confirmed) return;
+        try {
+            await api.delete(`/albums/${id}`);
+            navigate("/albums");
+        } catch (err) {
+            console.error(err);
+            alert("Could not delete album.");
+        }
+    };
+
+    // ----- Photo modal + comments -----
     const openPhotoModal = async (photo) => {
         setSelectedPhoto(photo);
         setComments([]);
         setNewComment("");
+        setEditingCommentId(null);
+        setEditingCommentText("");
         setCommentError("");
+
         if (!photo?.id) return;
         setCommentsLoading(true);
         try {
@@ -51,6 +84,33 @@ const AlbumDetails = ({ currentUser }) => {
         }
     };
 
+    const canEditPhoto = (photo) => {
+        if (!currentUser) return false;
+        if (currentUser.role === "admin") return true;
+        return photo.uploadedById === currentUser.id;
+    };
+
+    const handleDeletePhoto = async () => {
+        if (!selectedPhoto) return;
+        const confirmed = window.confirm("Delete this photo?");
+        if (!confirmed) return;
+        try {
+            await api.delete(`/photos/${selectedPhoto.id}`);
+            setPhotos((prev) => prev.filter((p) => p.id !== selectedPhoto.id));
+            setSelectedPhoto(null);
+        } catch (err) {
+            console.error(err);
+            setCommentError("Could not delete photo.");
+        }
+    };
+
+    const handleEditPhoto = () => {
+        if (!selectedPhoto) return;
+        navigate(`/photos/${selectedPhoto.id}/edit`);
+    };
+
+    // ----- Comments: create, delete, update -----
+
     const handleCreateComment = async (e) => {
         e.preventDefault();
         if (!selectedPhoto || !newComment.trim()) return;
@@ -61,16 +121,29 @@ const AlbumDetails = ({ currentUser }) => {
                 photoId: selectedPhoto.id,
             };
             const res = await api.post("/comments", payload);
-            setComments((prev) => [...prev, res.data]);
+            // jei backend grąžina sukurtą komentarą:
+            const created = res.data || payload;
+            setComments((prev) => [
+                ...prev,
+                { ...created, id: created.id ?? Date.now(), userId: currentUser?.id },
+            ]);
             setNewComment("");
         } catch (err) {
             console.error(err);
             if (err.response?.status === 401) {
                 setCommentError("You must be logged in to comment.");
+            } else if (err.response?.status === 404) {
+                setCommentError("Photo not found.");
             } else {
                 setCommentError("Could not add comment.");
             }
         }
+    };
+
+    const canModifyComment = (comment) => {
+        if (!currentUser) return false;
+        if (currentUser.role === "admin") return true;
+        return comment.userId === currentUser.id;
     };
 
     const handleDeleteComment = async (commentId) => {
@@ -83,10 +156,43 @@ const AlbumDetails = ({ currentUser }) => {
         }
     };
 
-    const canDeleteComment = (comment) => {
-        if (!currentUser) return false;
-        if (currentUser.role === "admin") return true;
-        return comment.userId === currentUser.id;
+    const startEditComment = (comment) => {
+        setEditingCommentId(comment.id);
+        setEditingCommentText(comment.content);
+    };
+
+    const cancelEditComment = () => {
+        setEditingCommentId(null);
+        setEditingCommentText("");
+    };
+
+    const handleUpdateComment = async () => {
+        if (!editingCommentId || !editingCommentText.trim() || !selectedPhoto) return;
+        setCommentError("");
+        try {
+            const payload = {
+                content: editingCommentText.trim(),
+                photoId: selectedPhoto.id,
+            };
+            await api.put(`/comments/${editingCommentId}`, payload);
+
+            setComments((prev) =>
+                prev.map((c) =>
+                    c.id === editingCommentId
+                        ? { ...c, content: editingCommentText.trim() }
+                        : c
+                )
+            );
+            setEditingCommentId(null);
+            setEditingCommentText("");
+        } catch (err) {
+            console.error(err);
+            if (err.response?.status === 403) {
+                setCommentError("You do not have permission to edit this comment.");
+            } else {
+                setCommentError("Could not update comment.");
+            }
+        }
     };
 
     return (
@@ -100,6 +206,17 @@ const AlbumDetails = ({ currentUser }) => {
                         <h2>{album.title}</h2>
                         {album.description && <p>{album.description}</p>}
                     </div>
+
+                    {canEditAlbum && (
+                        <div style={{ marginBottom: "1rem", display: "flex", gap: "0.5rem" }}>
+                            <button className="btn-secondary" onClick={handleEditAlbum}>
+                                Edit album
+                            </button>
+                            <button className="btn-secondary" onClick={handleDeleteAlbum}>
+                                Delete album
+                            </button>
+                        </div>
+                    )}
 
                     {currentUser && (
                         <div style={{ marginBottom: "1rem" }}>
@@ -139,7 +256,13 @@ const AlbumDetails = ({ currentUser }) => {
 
             <Modal
                 title={selectedPhoto?.title}
-                onClose={() => setSelectedPhoto(null)}
+                onClose={() => {
+                    setSelectedPhoto(null);
+                    setComments([]);
+                    setEditingCommentId(null);
+                    setEditingCommentText("");
+                    setCommentError("");
+                }}
             >
                 {selectedPhoto && (
                     <div className="modal-photo">
@@ -150,6 +273,17 @@ const AlbumDetails = ({ currentUser }) => {
                         />
                         {selectedPhoto.description && (
                             <p className="modal-text">{selectedPhoto.description}</p>
+                        )}
+
+                        {canEditPhoto(selectedPhoto) && (
+                            <div className="modal-actions" style={{ marginTop: "0.75rem" }}>
+                                <button className="btn-secondary" onClick={handleEditPhoto}>
+                                    Edit photo
+                                </button>
+                                <button className="btn-secondary" onClick={handleDeletePhoto}>
+                                    Delete photo
+                                </button>
+                            </div>
                         )}
 
                         <hr style={{ margin: "1rem 0" }} />
@@ -163,15 +297,63 @@ const AlbumDetails = ({ currentUser }) => {
                         <ul className="comment-list">
                             {comments.map((comment) => (
                                 <li key={comment.id} className="comment-item">
-                                    <p>{comment.content}</p>
-                                    {canDeleteComment(comment) && (
-                                        <button
-                                            type="button"
-                                            className="btn-text"
-                                            onClick={() => handleDeleteComment(comment.id)}
-                                        >
-                                            Delete
-                                        </button>
+                                    {editingCommentId === comment.id ? (
+                                        <>
+                                            <textarea
+                                                className="form-textarea"
+                                                rows="2"
+                                                value={editingCommentText}
+                                                onChange={(e) =>
+                                                    setEditingCommentText(e.target.value)
+                                                }
+                                            />
+                                            <div className="modal-actions" style={{ marginTop: "0.35rem" }}>
+                                                <button
+                                                    type="button"
+                                                    className="btn-secondary"
+                                                    onClick={cancelEditComment}
+                                                >
+                                                    Cancel
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    className="btn-primary"
+                                                    onClick={handleUpdateComment}
+                                                >
+                                                    Save
+                                                </button>
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <p>{comment.content}</p>
+                                            {canModifyComment(comment) && (
+                                                <div
+                                                    style={{
+                                                        display: "flex",
+                                                        gap: "0.5rem",
+                                                        marginTop: "0.25rem",
+                                                    }}
+                                                >
+                                                    <button
+                                                        type="button"
+                                                        className="btn-text"
+                                                        onClick={() => startEditComment(comment)}
+                                                    >
+                                                        Edit
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        className="btn-text"
+                                                        onClick={() =>
+                                                            handleDeleteComment(comment.id)
+                                                        }
+                                                    >
+                                                        Delete
+                                                    </button>
+                                                </div>
+                                            )}
+                                        </>
                                     )}
                                 </li>
                             ))}
