@@ -1,4 +1,3 @@
-// src/pages/MyAlbums.jsx
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import api from "../api/client";
@@ -7,19 +6,11 @@ const MyAlbums = ({ currentUser }) => {
     const [albums, setAlbums] = useState([]);
 
     useEffect(() => {
+        if (!currentUser) return;
         api
             .get("/albums")
             .then((res) => {
-                if (!currentUser) {
-                    setAlbums([]);
-                } else {
-                    // jei backend grąžina userId arba ownerId – filtruojam
-                    setAlbums(
-                        res.data.filter(
-                            (album) => album.userId === currentUser.id || album.ownerId === currentUser.id
-                        )
-                    );
-                }
+                setAlbums(res.data.filter((album) => album.userId === currentUser.id));
             })
             .catch((err) => console.error(err));
     }, [currentUser]);

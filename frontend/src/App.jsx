@@ -1,4 +1,3 @@
-// src/App.jsx
 import React, { useEffect, useState } from "react";
 import { Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
@@ -9,7 +8,10 @@ import AlbumDetails from "./pages/AlbumDetails";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import MyAlbums from "./pages/MyAlbums";
+import CreateAlbum from "./pages/CreateAlbum";
+import CreatePhoto from "./pages/CreatePhoto";
 import Modal from "./components/Modal";
+import api from "./api/client";
 
 const App = () => {
   const [currentUser, setCurrentUser] = useState(null);
@@ -34,12 +36,21 @@ const App = () => {
     setShowLogoutModal(true);
   };
 
-  const confirmLogout = () => {
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("refreshToken");
-    localStorage.removeItem("currentUser");
-    setCurrentUser(null);
-    setShowLogoutModal(false);
+  const confirmLogout = async () => {
+    const refreshToken = localStorage.getItem("refreshToken");
+    try {
+      if (refreshToken) {
+        await api.post("/auth/logout", { refreshToken });
+      }
+    } catch (err) {
+      console.error("Logout request failed", err);
+    } finally {
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
+      localStorage.removeItem("currentUser");
+      setCurrentUser(null);
+      setShowLogoutModal(false);
+    }
   };
 
   return (
@@ -49,7 +60,18 @@ const App = () => {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/albums" element={<Albums />} />
-        <Route path="/albums/:id" element={<AlbumDetails />} />
+        <Route
+          path="/albums/new"
+          element={<CreateAlbum currentUser={currentUser} />}
+        />
+        <Route
+          path="/albums/:id"
+          element={<AlbumDetails currentUser={currentUser} />}
+        />
+        <Route
+          path="/albums/:albumId/photos/new"
+          element={<CreatePhoto currentUser={currentUser} />}
+        />
         <Route
           path="/login"
           element={<Login onLoginSuccess={handleLoginSuccess} />}

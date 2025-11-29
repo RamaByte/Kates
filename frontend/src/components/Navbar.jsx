@@ -1,10 +1,8 @@
-// src/components/Navbar.jsx
 import React, { useState } from "react";
 import { Link, NavLink } from "react-router-dom";
 
 const Navbar = ({ currentUser, onLogout }) => {
     const [open, setOpen] = useState(false);
-
     const closeMenu = () => setOpen(false);
 
     return (
@@ -12,7 +10,6 @@ const Navbar = ({ currentUser, onLogout }) => {
             <div className="header-inner">
                 <Link to="/" className="brand">
                     <span className="brand-icon" aria-hidden="true">
-                        {/* paprasta SVG vektorine ikona (katės siluetas) */}
                         <svg viewBox="0 0 24 24">
                             <path
                                 d="M4 4l3 2 2-2 3 2 3-2 2 2 3-2v10c0 3.3-2.7 6-6 6H7c-3.3 0-6-2.7-6-6V4l3 2 0-2z"
@@ -23,7 +20,7 @@ const Navbar = ({ currentUser, onLogout }) => {
                     <span className="brand-text">Kaciuku Forum</span>
                 </Link>
 
-                {/* desktop menu */}
+                {/* desktop */}
                 <nav className="nav-links desktop-only">
                     <NavLink to="/" className="nav-link">
                         Home
@@ -32,9 +29,14 @@ const Navbar = ({ currentUser, onLogout }) => {
                         Albums
                     </NavLink>
                     {currentUser && (
-                        <NavLink to="/my-albums" className="nav-link">
-                            My albums
-                        </NavLink>
+                        <>
+                            <NavLink to="/my-albums" className="nav-link">
+                                My albums
+                            </NavLink>
+                            <NavLink to="/albums/new" className="nav-link">
+                                New album
+                            </NavLink>
+                        </>
                     )}
                 </nav>
 
@@ -72,7 +74,7 @@ const Navbar = ({ currentUser, onLogout }) => {
                 </button>
             </div>
 
-            {/* mobile slide menu */}
+            {/* mobile menu */}
             {open && (
                 <nav className="nav-links-mobile mobile-only">
                     <NavLink to="/" className="nav-link" onClick={closeMenu}>
@@ -82,9 +84,22 @@ const Navbar = ({ currentUser, onLogout }) => {
                         Albums
                     </NavLink>
                     {currentUser && (
-                        <NavLink to="/my-albums" className="nav-link" onClick={closeMenu}>
-                            My albums
-                        </NavLink>
+                        <>
+                            <NavLink
+                                to="/my-albums"
+                                className="nav-link"
+                                onClick={closeMenu}
+                            >
+                                My albums
+                            </NavLink>
+                            <NavLink
+                                to="/albums/new"
+                                className="nav-link"
+                                onClick={closeMenu}
+                            >
+                                New album
+                            </NavLink>
+                        </>
                     )}
                     <div className="nav-divider" />
                     {currentUser ? (
