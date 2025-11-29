@@ -61,19 +61,49 @@ export const updateAlbum = async (req, res) => {
   }
 };
 
+// albumController.js (ar pan.)
 export const deleteAlbum = async (req, res) => {
   try {
     const id = Number(req.params.id);
     const existing = await prisma.album.findUnique({ where: { id } });
-    if (!existing) return res.status(404).json({ error: "Album not found" });
-    // only admin can delete (route already protected)
-    await prisma.album.delete({ where: { id } });
-    res.status(200).json({ ok: true });
+    if (!existing) {
+      return res.status(404).json({ error: "Album not found" });
+    }
+
+    // admin gali trinti visus, member – tik savo
+    const isAdmin = req.user.role === "admin";
+    const isOwner = existing.userId === req.user.id;
+
+    if (!isAdmin && !isOwner) {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+
+    // 1) ištrinam komentarus prie nuotraukų šiame albume
+    // 2) ištrinam nuotraukas šiame albume
+    // 3) ištrinam patį albumą
+    await prisma.$transaction([
+      prisma.comment.deleteMany({
+        where: {
+          photo: {
+            albumId: id,
+          },
+        },
+      }),
+      prisma.photo.deleteMany({
+        where: { albumId: id },
+      }),
+      prisma.album.delete({
+        where: { id },
+      }),
+    ]);
+
+    return res.status(200).json({ ok: true });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Server error" });
+    console.error("deleteAlbum error", err);
+    return res.status(500).json({ error: "Server error" });
   }
 };
+
 
 export const getAlbumPhotos = async (req, res) => {
   try {
