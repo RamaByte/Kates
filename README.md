@@ -1,7 +1,6 @@
-# Kaciuku Forum API
+# Kates
 
-Kaciuku Forum is a RESTful API for managing cat photo albums, photos, and comments.  
-Backend is built with Node.js, Express, Prisma ORM, PostgreSQL and JWT authentication (access + refresh tokens).
+Kates is a forum for all your cat photos in one place
 
 ---
 
