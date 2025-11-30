@@ -6,7 +6,7 @@ const Footer = () => {
         <footer className="footer">
             <div className="footer-inner">
                 <p className="footer-text">
-                    © {new Date().getFullYear()} Kaciuku Forum. All rights reserved.
+                    Ramojus Drachneris IFF-2/2
                 </p>
                 <div className="footer-links">
                     <a href="https://kates.onrender.com/api-docs" target="_blank" rel="noreferrer">

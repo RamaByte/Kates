@@ -451,10 +451,17 @@ a {
 /* FOOTER */
 
 .footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+
     background: #020617;
     color: #cbd5f5;
     padding: 0.75rem 1rem;
-    margin-top: auto;
+    border-top: 1px solid rgba(148, 163, 184, 0.4);
+    z-index: 40;
+    /* kad neuždengtų kiti dalykai */
 }
 
 .footer-inner {
@@ -483,6 +490,12 @@ a {
 
 .footer-links a:hover {
     text-decoration: underline;
+}
+
+.content {
+    margin-top: 1rem;
+    padding-bottom: 4rem;
+    /* ~ footer aukštis, gali koreguot 3–5rem */
 }
 
 /* HAMBURGER (mobile) */
@@ -569,6 +582,8 @@ a {
 
     .content {
         margin-top: 1rem;
+        padding-bottom: 4rem;
+        /* ~ footer aukštis, gali koreguot 3–5rem */
     }
 
     .footer-inner {
