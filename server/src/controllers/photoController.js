@@ -26,25 +26,58 @@ export const getPhotoById = async (req, res) => {
 export const createPhoto = async (req, res) => {
   try {
     const { title, description, imageUrl, albumId } = req.body;
-    if (!title || !imageUrl || !albumId) return res.status(400).json({ error: "Missing fields" });
-    if (!req.user.id) return res.status(401).json({ error: "Login required" });
+
+    if (!title || !imageUrl || !albumId) {
+      return res.status(400).json({ error: "Missing fields" });
+    }
+    if (!req.user?.id) {
+      return res.status(401).json({ error: "Login required" });
+    }
+
+    // validuojam URL
     try {
       new URL(imageUrl);
     } catch {
       return res.status(422).json({ error: "Invalid image URL" });
     }
 
+    const albumIdNum = Number(albumId);
+    if (Number.isNaN(albumIdNum)) {
+      return res.status(400).json({ error: "Invalid albumId" });
+    }
+
     // verify album exists
-    const album = await prisma.album.findUnique({ where: { id: Number(albumId) } });
-    if (!album) return res.status(404).json({ error: "Album not found" });
+    const album = await prisma.album.findUnique({
+      where: { id: albumIdNum },
+    });
+    if (!album) {
+      return res.status(404).json({ error: "Album not found" });
+    }
+
+    // --- LEIDIMAI ---
+    const isAdmin = req.user.role === "admin";
+    const isOwner = album.userId === req.user.id;
+
+    // admin gali visur, member tik savo albumui
+    if (!isAdmin && !isOwner) {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+    // --- /LEIDIMAI ---
 
     const photo = await prisma.photo.create({
-      data: { title, description: description || null, imageUrl, albumId: Number(albumId), uploadedById: req.user.id }
+      data: {
+        title,
+        description: description || null,
+        imageUrl,
+        albumId: albumIdNum,
+        uploadedById: req.user.id,
+      },
     });
-    res.status(201).json(photo);
+
+    return res.status(201).json(photo);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Server error" });
+    console.error("createPhoto error", err);
+    return res.status(500).json({ error: "Server error" });
   }
 };
 

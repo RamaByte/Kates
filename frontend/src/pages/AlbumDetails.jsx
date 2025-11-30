@@ -218,7 +218,7 @@ const AlbumDetails = ({ currentUser }) => {
                         </div>
                     )}
 
-                    {currentUser && (
+                    {canEditAlbum && (
                         <div style={{ marginBottom: "1rem" }}>
                             <Link
                                 to={`/albums/${id}/photos/new`}
