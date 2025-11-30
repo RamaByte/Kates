@@ -351,6 +351,10 @@ const AlbumDetails = ({ currentUser }) => {
                                                 </>
                                             ) : (
                                                 <>
+                                                    {/* KOMENTUOTOJO USERNAME */}
+                                                    <p className="comment-author">
+                                                        {comment.user?.name ?? "Unknown user"}
+                                                    </p>
                                                     <p>{comment.content}</p>
                                                     {canModifyComment(comment) && (
                                                         <div
