@@ -1,17 +1,27 @@
 /* src/styles.css */
 
-/* global */
+/* global – TORTOISESHELL PALETTE */
 :root {
-    --bg: #0f172a;
-    --bg-light: #f1f5f9;
-    --accent: #e11d48;
-    --accent-soft: #ffe4ef;
-    --text-main: #0f172a;
-    --text-muted: #64748b;
-    --border-subtle: #e2e8f0;
+    /* fonai – daugiau juodos */
+    --bg: #050816;
+    /* pagrindinis fonas (beveik juodas) */
+    --bg-light: #020617;
+    /* kortelės / paviršiai */
+
+    /* akcentai – oranžinė kaip tortie dėmės */
+    --accent: #f97316;
+    /* ryški oranžinė */
+    --accent-soft: #fed7aa;
+    /* švelni oranžinė */
+
+    /* tekstas – šviesus ant tamsaus */
+    --text-main: #f9fafb;
+    --text-muted: #cbd5f5;
+
+    --border-subtle: rgba(148, 163, 184, 0.25);
     --radius-lg: 16px;
     --radius-md: 10px;
-    --shadow-soft: 0 10px 25px rgba(15, 23, 42, 0.12);
+    --shadow-soft: 0 10px 25px rgba(15, 23, 42, 0.4);
 }
 
 *,
@@ -24,7 +34,7 @@ body {
     margin: 0;
     font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont,
         "Segoe UI", sans-serif;
-    background: var(--bg-light);
+    background: var(--bg);
     color: var(--text-main);
 }
 
@@ -42,9 +52,9 @@ a {
 /* HEADER */
 
 .header {
-    background: linear-gradient(90deg, #0f172a, #1e293b);
+    background: radial-gradient(circle at top left, #f97316 0, #020617 40%, #020617 100%);
     color: white;
-    box-shadow: 0 4px 20px rgba(15, 23, 42, 0.35);
+    box-shadow: 0 4px 20px rgba(15, 23, 42, 0.7);
     position: sticky;
     top: 0;
     z-index: 20;
@@ -104,8 +114,8 @@ a {
 }
 
 .nav-link.active {
-    background: white;
-    color: #0f172a;
+    background: var(--accent);
+    color: #0b1120;
 }
 
 .header-right {
@@ -119,7 +129,7 @@ a {
     font-size: 0.85rem;
     padding: 0.25rem 0.7rem;
     border-radius: 999px;
-    background: rgba(15, 23, 42, 0.25);
+    background: rgba(15, 23, 42, 0.7);
 }
 
 .auth-links {
@@ -148,23 +158,23 @@ a {
 
 .btn-primary {
     background: var(--accent);
-    color: white;
-    box-shadow: 0 8px 18px rgba(225, 29, 72, 0.35);
+    color: #111827;
+    box-shadow: 0 8px 18px rgba(249, 115, 22, 0.45);
 }
 
 .btn-primary:hover {
     transform: translateY(-1px);
-    box-shadow: 0 12px 24px rgba(225, 29, 72, 0.45);
+    box-shadow: 0 12px 24px rgba(249, 115, 22, 0.6);
 }
 
 .btn-secondary {
-    background: white;
-    color: #0f172a;
-    border: 1px solid rgba(148, 163, 184, 0.4);
+    background: #0b1120;
+    color: var(--text-main);
+    border: 1px solid rgba(148, 163, 184, 0.6);
 }
 
 .btn-secondary:hover {
-    background: #e5e7eb;
+    background: #111827;
 }
 
 .btn-text {
@@ -219,10 +229,11 @@ a {
 }
 
 .hero-image-card {
-    background: white;
+    background: #020617;
     border-radius: var(--radius-lg);
     padding: 0.75rem;
     box-shadow: var(--shadow-soft);
+    border: 1px solid rgba(148, 163, 184, 0.35);
 }
 
 .hero-image {
@@ -257,22 +268,22 @@ a {
 }
 
 .card {
-    background: white;
+    background: #020617;
     border-radius: var(--radius-md);
     padding: 0.9rem 1rem 0.8rem;
-    box-shadow: 0 12px 20px rgba(15, 23, 42, 0.06);
+    box-shadow: 0 12px 20px rgba(15, 23, 42, 0.6);
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    border: 1px solid rgba(148, 163, 184, 0.2);
+    border: 1px solid rgba(148, 163, 184, 0.35);
     transition: transform 0.15s ease, box-shadow 0.15s ease,
         border-color 0.15s ease;
 }
 
 .card:hover {
     transform: translateY(-3px);
-    box-shadow: 0 18px 32px rgba(15, 23, 42, 0.16);
-    border-color: rgba(99, 102, 241, 0.55);
+    box-shadow: 0 18px 32px rgba(15, 23, 42, 0.9);
+    border-color: rgba(249, 115, 22, 0.8);
 }
 
 .card-body h3 {
@@ -295,20 +306,22 @@ a {
 /* photo cards */
 
 .photo-card {
-    background: white;
+    background: #020617;
     border-radius: var(--radius-md);
     padding: 0.55rem;
-    border: 1px solid rgba(148, 163, 184, 0.35);
+    border: 1px solid rgba(148, 163, 184, 0.45);
     display: flex;
     flex-direction: column;
     cursor: pointer;
     text-align: left;
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    transition: transform 0.15s ease, box-shadow 0.15s ease,
+        border-color 0.15s ease;
 }
 
 .photo-card:hover {
     transform: translateY(-3px);
-    box-shadow: 0 16px 28px rgba(15, 23, 42, 0.16);
+    box-shadow: 0 16px 28px rgba(15, 23, 42, 0.9);
+    border-color: rgba(249, 115, 22, 0.8);
 }
 
 .photo-img {
@@ -334,10 +347,11 @@ a {
     max-width: 420px;
     margin: 2rem auto;
     padding: 1.5rem 1.75rem;
-    background: white;
+    background: #020617;
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-soft);
-    border: 1px solid rgba(148, 163, 184, 0.3);
+    border: 1px solid rgba(148, 163, 184, 0.45);
+    color: var(--text-main);
 }
 
 .form-card h2 {
@@ -360,6 +374,7 @@ a {
 .form-label {
     font-size: 0.9rem;
     font-weight: 500;
+    color: var(--text-muted);
 }
 
 .form-input,
@@ -367,21 +382,29 @@ a {
     font: inherit;
     padding: 0.55rem 0.65rem;
     border-radius: 0.55rem;
-    border: 1px solid #cbd5f5;
+    border: 1px solid #334155;
     outline: none;
-    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease,
+        background-color 0.15s ease;
+    background: #020617;
+    color: var(--text-main);
+}
+
+.form-input::placeholder,
+.form-textarea::placeholder {
+    color: #64748b;
 }
 
 .form-input:focus,
 .form-textarea:focus {
-    border-color: #4f46e5;
-    box-shadow: 0 0 0 1px rgba(79, 70, 229, 0.4);
+    border-color: var(--accent);
+    box-shadow: 0 0 0 1px rgba(249, 115, 22, 0.6);
 }
 
 .form-error {
     margin: 0;
     font-size: 0.85rem;
-    color: #b91c1c;
+    color: #fecaca;
 }
 
 /* MODAL */
@@ -403,9 +426,8 @@ a {
     height: min(95vh, 100%);
     background: #020617;
     color: #e2e8f0;
-    /* ŠVIESUS TEKSTAS ANT TAMSUS FONO */
     border-radius: 0.75rem;
-    box-shadow: 0 20px 40px rgba(15, 23, 42, 0.7);
+    box-shadow: 0 20px 40px rgba(15, 23, 42, 0.9);
     display: flex;
     flex-direction: column;
 }
@@ -428,20 +450,18 @@ a {
 .modal-body {
     flex: 1;
     overflow: hidden;
-    /* labai svarbu, kad vidus pats valdytų scroll'ą */
     padding: 0.75rem 1rem 1rem;
 }
 
-/* --- Naujas photo + comments layout --- */
+/* --- Photo + comments layout --- */
 
-/* Visa vidinė sritis (kairė foto, dešinė komentarai) */
 .modal-photo {
     display: flex;
     gap: 1rem;
     height: 100%;
 }
 
-/* Kairė – nuotrauka (didesnė dalis) */
+/* Kairė – nuotrauka */
 .modal-photo-left {
     flex: 3;
     display: flex;
@@ -474,7 +494,6 @@ a {
     margin-bottom: 0.5rem;
 }
 
-/* Kad aprašymo tekstas būtų aiškiai matomas */
 .modal-text {
     margin: 0.25rem 0 0;
     font-size: 0.9rem;
@@ -567,13 +586,6 @@ a {
     text-decoration: underline;
 }
 
-/* content padding dėl footer ir header */
-.content {
-    margin-top: 1rem;
-    padding-bottom: 4rem;
-    /* ~ footer aukštis */
-}
-
 /* HAMBURGER (mobile) */
 
 .hamburger {
@@ -607,22 +619,6 @@ a {
 .nav-divider {
     border-top: 1px solid rgba(148, 163, 184, 0.4);
     margin: 0.45rem 0;
-}
-
-/* (dubliuota, bet ok) komentarų bendri */
-.comment-list {
-    list-style: none;
-    padding-left: 0;
-    margin: 0.5rem 0 0;
-    display: flex;
-    flex-direction: column;
-    gap: 0.4rem;
-}
-
-.comment-item {
-    font-size: 0.9rem;
-    border-bottom: 1px solid rgba(148, 163, 184, 0.3);
-    padding-bottom: 0.35rem;
 }
 
 /* RESPONSIVE */
