@@ -62,7 +62,7 @@ const App = () => {
       <Navbar currentUser={currentUser} onLogout={handleLogout} />
 
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<Home currentUser={currentUser} />} />
         <Route path="/albums" element={<Albums />} />
         <Route
           path="/albums/new"

@@ -72,28 +72,42 @@ a {
 .brand {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.6rem;
 }
 
+/* Didesnis logo, be pilko apskritimo */
 .brand-icon {
-    width: 32px;
-    height: 32px;
-    border-radius: 999px;
-    background: rgba(248, 250, 252, 0.1);
+    width: 40px;
+    /* gali didinti iki 48px jei dar per mažas */
+    height: 40px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    padding: 0;
+
+    background: transparent;
+    /* NEBĖRA pilko fono */
+    border-radius: 0;
+    /* NEBĖRA apskritimo */
 }
 
-.brand-icon svg {
-    width: 20px;
-    height: 20px;
+/* Kad SVG arba IMG logotipas užimtų visą brand-icon */
+.brand-icon svg,
+.brand-icon img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: contain;
 }
+
 
 .brand-text {
     font-weight: 600;
     font-size: 1.1rem;
+    margin-left: 10px;
+    /* ar bet kokia reikiama reikšmė */
 }
+
 
 .nav-links {
     display: flex;

@@ -2,7 +2,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-const Home = () => {
+const Home = ({ currentUser }) => {
     return (
         <main className="content">
             <section className="hero">
@@ -13,12 +13,22 @@ const Home = () => {
                         the world.
                     </p>
                     <div className="hero-actions">
-                        <Link to="/albums" className="btn-primary">
-                            Browse albums
-                        </Link>
-                        <Link to="/register" className="btn-secondary">
-                            Create an account
-                        </Link>
+                        {currentUser ? (
+                            <>
+                                <Link to="/albums" className="btn-primary">
+                                    Browse albums
+                                </Link>
+                            </>
+                        ) : (
+                            <>
+                                <Link to="/albums" className="btn-primary">
+                                    Browse albums
+                                </Link>
+                                <Link to="/register" className="btn-secondary">
+                                    Create an account
+                                </Link>
+                            </>
+                        )}
                     </div>
                 </div>
                 <div className="hero-image-card">

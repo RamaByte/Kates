@@ -1,6 +1,7 @@
 // src/components/Navbar.jsx
 import React, { useState } from "react";
 import { Link, NavLink } from "react-router-dom";
+import KatesLogo from "../assets/Kates.png";
 
 const Navbar = ({ currentUser, onLogout }) => {
     const [open, setOpen] = useState(false);
@@ -17,15 +18,15 @@ const Navbar = ({ currentUser, onLogout }) => {
             <div className="header-inner">
                 <Link to="/" className="brand">
                     <span className="brand-icon" aria-hidden="true">
-                        <svg viewBox="0 0 24 24">
-                            <path
-                                d="M4 4l3 2 2-2 3 2 3-2 2 2 3-2v10c0 3.3-2.7 6-6 6H7c-3.3 0-6-2.7-6-6V4l3 2 0-2z"
-                                fill="currentColor"
-                            />
-                        </svg>
+                        <img
+                            src={KatesLogo}
+                            alt="Kates logo"
+                            style={{ width: "70px", height: "70px", objectFit: "contain" }}
+                        />
                     </span>
-                    <span className="brand-text">Kaciuku Forum</span>
+                    <span className="brand-text">Kates</span>
                 </Link>
+
 
                 {/* desktop menu */}
                 <nav className="nav-links desktop-only">
