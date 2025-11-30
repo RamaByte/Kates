@@ -266,122 +266,154 @@ const AlbumDetails = ({ currentUser }) => {
             >
                 {selectedPhoto && (
                     <div className="modal-photo">
-                        <img
-                            src={selectedPhoto.imageUrl}
-                            alt={selectedPhoto.title}
-                            className="photo-img"
-                        />
-                        {selectedPhoto.description && (
-                            <p className="modal-text">{selectedPhoto.description}</p>
-                        )}
+                        {/* Kairė pusė – didelė nuotrauka */}
+                        <div className="modal-photo-left">
+                            <img
+                                src={selectedPhoto.imageUrl}
+                                alt={selectedPhoto.title}
+                                className="photo-img modal-photo-img"
+                            />
+                        </div>
 
-                        {canEditPhoto(selectedPhoto) && (
-                            <div className="modal-actions" style={{ marginTop: "0.75rem" }}>
-                                <button className="btn-secondary" onClick={handleEditPhoto}>
-                                    Edit photo
-                                </button>
-                                <button className="btn-secondary" onClick={handleDeletePhoto}>
-                                    Delete photo
-                                </button>
+                        {/* Dešinė pusė – aprašymas + komentarai + forma */}
+                        <div className="modal-photo-right">
+                            {/* Aprašymas + Edit/Delete */}
+                            <div className="modal-photo-meta">
+                                {selectedPhoto.description && (
+                                    <p className="modal-text">{selectedPhoto.description}</p>
+                                )}
+
+                                {canEditPhoto(selectedPhoto) && (
+                                    <div
+                                        className="modal-actions"
+                                        style={{
+                                            marginTop: "0.5rem",
+                                            display: "flex",
+                                            gap: "0.5rem",
+                                            flexWrap: "wrap",
+                                        }}
+                                    >
+                                        <button className="btn-secondary" onClick={handleEditPhoto}>
+                                            Edit photo
+                                        </button>
+                                        <button className="btn-secondary" onClick={handleDeletePhoto}>
+                                            Delete photo
+                                        </button>
+                                    </div>
+                                )}
                             </div>
-                        )}
 
-                        <hr style={{ margin: "1rem 0" }} />
-                        <h4>Comments</h4>
+                            {/* Scroll'inami komentarai */}
+                            <div className="modal-comments-scroll">
+                                <h4>Comments</h4>
 
-                        {commentsLoading && <p>Loading comments...</p>}
-                        {!commentsLoading && comments.length === 0 && (
-                            <p>No comments yet.</p>
-                        )}
+                                {commentsLoading && <p>Loading comments...</p>}
+                                {!commentsLoading && comments.length === 0 && (
+                                    <p>No comments yet.</p>
+                                )}
 
-                        <ul className="comment-list">
-                            {comments.map((comment) => (
-                                <li key={comment.id} className="comment-item">
-                                    {editingCommentId === comment.id ? (
-                                        <>
-                                            <textarea
-                                                className="form-textarea"
-                                                rows="2"
-                                                value={editingCommentText}
-                                                onChange={(e) =>
-                                                    setEditingCommentText(e.target.value)
-                                                }
-                                            />
-                                            <div className="modal-actions" style={{ marginTop: "0.35rem" }}>
-                                                <button
-                                                    type="button"
-                                                    className="btn-secondary"
-                                                    onClick={cancelEditComment}
-                                                >
-                                                    Cancel
-                                                </button>
-                                                <button
-                                                    type="button"
-                                                    className="btn-primary"
-                                                    onClick={handleUpdateComment}
-                                                >
-                                                    Save
-                                                </button>
-                                            </div>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <p>{comment.content}</p>
-                                            {canModifyComment(comment) && (
-                                                <div
-                                                    style={{
-                                                        display: "flex",
-                                                        gap: "0.5rem",
-                                                        marginTop: "0.25rem",
-                                                    }}
-                                                >
-                                                    <button
-                                                        type="button"
-                                                        className="btn-text"
-                                                        onClick={() => startEditComment(comment)}
-                                                    >
-                                                        Edit
-                                                    </button>
-                                                    <button
-                                                        type="button"
-                                                        className="btn-text"
-                                                        onClick={() =>
-                                                            handleDeleteComment(comment.id)
+                                <ul className="comment-list">
+                                    {comments.map((comment) => (
+                                        <li key={comment.id} className="comment-item">
+                                            {editingCommentId === comment.id ? (
+                                                <>
+                                                    <textarea
+                                                        className="form-textarea"
+                                                        rows="2"
+                                                        value={editingCommentText}
+                                                        onChange={(e) =>
+                                                            setEditingCommentText(e.target.value)
                                                         }
+                                                    />
+                                                    <div
+                                                        className="modal-actions"
+                                                        style={{
+                                                            marginTop: "0.35rem",
+                                                            display: "flex",
+                                                            gap: "0.5rem",
+                                                        }}
                                                     >
-                                                        Delete
-                                                    </button>
-                                                </div>
+                                                        <button
+                                                            type="button"
+                                                            className="btn-secondary"
+                                                            onClick={cancelEditComment}
+                                                        >
+                                                            Cancel
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            className="btn-primary"
+                                                            onClick={handleUpdateComment}
+                                                        >
+                                                            Save
+                                                        </button>
+                                                    </div>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <p>{comment.content}</p>
+                                                    {canModifyComment(comment) && (
+                                                        <div
+                                                            style={{
+                                                                display: "flex",
+                                                                gap: "0.5rem",
+                                                                marginTop: "0.25rem",
+                                                            }}
+                                                        >
+                                                            <button
+                                                                type="button"
+                                                                className="btn-text"
+                                                                onClick={() => startEditComment(comment)}
+                                                            >
+                                                                Edit
+                                                            </button>
+                                                            <button
+                                                                type="button"
+                                                                className="btn-text"
+                                                                onClick={() =>
+                                                                    handleDeleteComment(comment.id)
+                                                                }
+                                                            >
+                                                                Delete
+                                                            </button>
+                                                        </div>
+                                                    )}
+                                                </>
                                             )}
-                                        </>
-                                    )}
-                                </li>
-                            ))}
-                        </ul>
+                                        </li>
+                                    ))}
+                                </ul>
 
-                        {commentError && <p className="form-error">{commentError}</p>}
-
-                        <form className="form" onSubmit={handleCreateComment}>
-                            <div className="form-group">
-                                <label className="form-label" htmlFor="new-comment">
-                                    Add a comment
-                                </label>
-                                <textarea
-                                    id="new-comment"
-                                    className="form-textarea"
-                                    rows="3"
-                                    value={newComment}
-                                    onChange={(e) => setNewComment(e.target.value)}
-                                    placeholder="Write your comment…"
-                                />
+                                {commentError && <p className="form-error">{commentError}</p>}
                             </div>
-                            <button type="submit" className="btn-primary">
-                                Post comment
-                            </button>
-                        </form>
+
+                            {/* Forma apačioje – visada matoma */}
+                            <form
+                                className="form modal-comment-form"
+                                onSubmit={handleCreateComment}
+                            >
+                                <div className="form-group">
+                                    <label className="form-label" htmlFor="new-comment">
+                                        Add a comment
+                                    </label>
+                                    <textarea
+                                        id="new-comment"
+                                        className="form-textarea"
+                                        rows="3"
+                                        value={newComment}
+                                        onChange={(e) => setNewComment(e.target.value)}
+                                        placeholder="Write your comment…"
+                                    />
+                                </div>
+                                <button type="submit" className="btn-primary">
+                                    Post comment
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 )}
             </Modal>
+
         </main>
     );
 };

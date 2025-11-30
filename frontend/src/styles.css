@@ -170,7 +170,6 @@ a {
 .btn-text {
     background: transparent;
     color: var(--accent);
-    /* pvz. rožinė, matoma ant balto fono */
 }
 
 /* Header'e ant tamsaus fono paliekam baltą */
@@ -181,7 +180,6 @@ a {
 .btn-text:hover {
     text-decoration: underline;
 }
-
 
 .full-width {
     width: 100%;
@@ -388,57 +386,134 @@ a {
 
 /* MODAL */
 
+/* Pilnas overlay virš visko (virš header ir footer) */
 .modal-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(15, 23, 42, 0.55);
+    background: rgba(15, 23, 42, 0.85);
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 40;
-    animation: fadeIn 0.18s ease-out;
+    z-index: 999;
 }
 
+/* Kortelė modal viduje – beveik pilnas ekranas */
 .modal-card {
-    width: min(480px, 92%);
-    background: white;
-    border-radius: var(--radius-lg);
-    box-shadow: 0 18px 40px rgba(15, 23, 42, 0.3);
-    padding: 1.25rem 1.25rem 1rem;
-    animation: liftIn 0.18s ease-out;
+    width: min(1200px, 100%);
+    height: min(95vh, 100%);
+    background: #020617;
+    color: #e2e8f0;
+    /* ŠVIESUS TEKSTAS ANT TAMSUS FONO */
+    border-radius: 0.75rem;
+    box-shadow: 0 20px 40px rgba(15, 23, 42, 0.7);
+    display: flex;
+    flex-direction: column;
 }
 
+/* Header su pavadinimu ir X */
 .modal-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 1rem;
-    margin-bottom: 0.75rem;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.4);
 }
 
 .modal-header h3 {
     margin: 0;
+    font-size: 1rem;
 }
 
+/* Body užima likusią vietą ir neleidžiam jam išsiplėsti už */
 .modal-body {
-    font-size: 0.95rem;
+    flex: 1;
+    overflow: hidden;
+    /* labai svarbu, kad vidus pats valdytų scroll'ą */
+    padding: 0.75rem 1rem 1rem;
 }
 
+/* --- Naujas photo + comments layout --- */
+
+/* Visa vidinė sritis (kairė foto, dešinė komentarai) */
 .modal-photo {
     display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
+    gap: 1rem;
+    height: 100%;
 }
 
-.modal-text {
-    margin: 0;
-}
-
-.modal-actions {
-    margin-top: 1rem;
+/* Kairė – nuotrauka (didesnė dalis) */
+.modal-photo-left {
+    flex: 3;
     display: flex;
-    justify-content: flex-end;
-    gap: 0.5rem;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border-radius: 0.5rem;
+    background: #020617;
+}
+
+/* Didelė nuotrauka, bet su "contain" kad neapkarpytų */
+.modal-photo-img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    border-radius: 0.5rem;
+}
+
+/* Dešinė – komentarų stulpelis */
+.modal-photo-right {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+/* Aprašymas + edit/delete mygtukai viršuje */
+.modal-photo-meta {
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+/* Kad aprašymo tekstas būtų aiškiai matomas */
+.modal-text {
+    margin: 0.25rem 0 0;
+    font-size: 0.9rem;
+    color: #e2e8f0;
+}
+
+/* Komentarų scroll'inama zona */
+.modal-comments-scroll {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 0.25rem;
+    margin-bottom: 0.5rem;
+}
+
+/* Forma apačioje – prilipusi prie apačios */
+.modal-comment-form {
+    border-top: 1px solid rgba(148, 163, 184, 0.4);
+    padding-top: 0.5rem;
+}
+
+.modal-comment-form .form-textarea {
+    min-height: 60px;
+    max-height: 120px;
+}
+
+.comment-list {
+    list-style: none;
+    padding-left: 0;
+    margin: 0.5rem 0 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.comment-item {
+    font-size: 0.9rem;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.3);
+    padding-bottom: 0.35rem;
+    color: #e5e7eb;
 }
 
 .icon-button {
@@ -446,6 +521,7 @@ a {
     background: transparent;
     cursor: pointer;
     font-size: 1.1rem;
+    color: #e5e7eb;
 }
 
 /* FOOTER */
@@ -461,7 +537,6 @@ a {
     padding: 0.75rem 1rem;
     border-top: 1px solid rgba(148, 163, 184, 0.4);
     z-index: 40;
-    /* kad neuždengtų kiti dalykai */
 }
 
 .footer-inner {
@@ -492,10 +567,11 @@ a {
     text-decoration: underline;
 }
 
+/* content padding dėl footer ir header */
 .content {
     margin-top: 1rem;
     padding-bottom: 4rem;
-    /* ~ footer aukštis, gali koreguot 3–5rem */
+    /* ~ footer aukštis */
 }
 
 /* HAMBURGER (mobile) */
@@ -533,6 +609,7 @@ a {
     margin: 0.45rem 0;
 }
 
+/* (dubliuota, bet ok) komentarų bendri */
 .comment-list {
     list-style: none;
     padding-left: 0;
@@ -548,7 +625,6 @@ a {
     padding-bottom: 0.35rem;
 }
 
-
 /* RESPONSIVE */
 
 .desktop-only {
@@ -560,6 +636,21 @@ a {
 }
 
 @media (max-width: 768px) {
+    .modal-card {
+        width: 100%;
+        height: 100%;
+        border-radius: 0;
+    }
+
+    .modal-photo {
+        flex-direction: column;
+    }
+
+    .modal-photo-left {
+        flex: 0 0 auto;
+        max-height: 50vh;
+    }
+
     .header-inner {
         padding-inline: 0.75rem;
     }
@@ -583,7 +674,6 @@ a {
     .content {
         margin-top: 1rem;
         padding-bottom: 4rem;
-        /* ~ footer aukštis, gali koreguot 3–5rem */
     }
 
     .footer-inner {
